@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
-import { User as UserIcon, Plus, Search, Edit2, Shield, Upload } from 'lucide-react'
+import { User as UserIcon, Plus, Search, Edit2, Shield, Upload, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
+import pb from '@/lib/pocketbase/client'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,7 +29,7 @@ import { Badge } from '@/components/ui/badge'
 
 import { useRealtime } from '@/hooks/use-realtime'
 import { User, UserRole, UserStatus } from '@/types'
-import { getUsers, createUser, updateUser } from '@/services/users'
+import { getUsers, createUser, updateUser, deleteUser } from '@/services/users'
 import { extractFieldErrors, type FieldErrors } from '@/lib/pocketbase/errors'
 
 const ROLES: UserRole[] = [
@@ -129,6 +130,11 @@ export default function Equipe() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
   const loadUsers = async () => {
     try {
       const data = await getUsers()
@@ -177,10 +183,10 @@ export default function Equipe() {
   const handleEdit = (user: User) => {
     setFormData({
       id: user.id,
-      name: user.name,
+      name: user.name || '',
       cpf: user.cpf || '',
       phone: user.phone || '',
-      email: user.email,
+      email: user.email || '',
       password: '',
       nickname: user.nickname || '',
       role: user.role || '',
@@ -202,6 +208,46 @@ export default function Equipe() {
     setFormData(initialFormState)
     setErrors({})
     setIsModalOpen(true)
+  }
+
+  const confirmDelete = (user: User) => {
+    setUserToDelete(user)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!userToDelete) return
+    setIsDeleting(true)
+
+    try {
+      const safeName = userToDelete.name.replace(/'/g, "\\'")
+      const safeNick = (userToDelete.nickname || '').replace(/'/g, "\\'")
+
+      let hasLinks = false
+
+      const tableFilter = `responsible_name = '${safeName}'${safeNick ? ` || responsible_name = '${safeNick}'` : ''}`
+      const tables = await pb.collection('tables').getList(1, 1, { filter: tableFilter })
+      if (tables.totalItems > 0) hasLinks = true
+
+      const orderFilter = `customer_name = '${safeName}'${safeNick ? ` || customer_name = '${safeNick}'` : ''}`
+      const orders = await pb.collection('orders').getList(1, 1, { filter: orderFilter })
+      if (orders.totalItems > 0) hasLinks = true
+
+      if (hasLinks) {
+        setIsDeleteModalOpen(false)
+        setIsBlockedModalOpen(true)
+      } else {
+        await deleteUser(userToDelete.id)
+        toast.success('Funcionário excluído com sucesso.')
+        setIsDeleteModalOpen(false)
+        setUserToDelete(null)
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error('Erro ao excluir funcionário.')
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -352,9 +398,19 @@ export default function Equipe() {
                     <span className="text-sm font-mono">{user.phone || '-'}</span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(user)}>
-                      <Edit2 className="w-4 h-4 text-muted-foreground" />
-                    </Button>
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(user)}>
+                        <Edit2 className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => confirmDelete(user)}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -362,6 +418,41 @@ export default function Equipe() {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground">
+            Tem certeza que deseja excluir <strong>{userToDelete?.name}</strong>? Esta ação não pode
+            ser desfeita.
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? 'Excluindo...' : 'Confirmar Exclusão'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isBlockedModalOpen} onOpenChange={setIsBlockedModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Exclusão Bloqueada</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground">
+            Este funcionário possui registros no sistema. Em vez de excluir, altere o status para
+            Inativo.
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button onClick={() => setIsBlockedModalOpen(false)}>Entendi</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-3xl p-0 overflow-hidden">
@@ -419,7 +510,7 @@ export default function Equipe() {
                       <Label htmlFor="name">Nome Completo *</Label>
                       <Input
                         id="name"
-                        value={formData.name}
+                        value={formData.name || ''}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
                       />
@@ -429,7 +520,7 @@ export default function Equipe() {
                       <Label htmlFor="nickname">Como quer ser chamado</Label>
                       <Input
                         id="nickname"
-                        value={formData.nickname}
+                        value={formData.nickname || ''}
                         onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
                       />
                     </div>
@@ -437,7 +528,7 @@ export default function Equipe() {
                       <Label htmlFor="cpf">CPF *</Label>
                       <Input
                         id="cpf"
-                        value={formData.cpf}
+                        value={formData.cpf || ''}
                         onChange={(e) => setFormData({ ...formData, cpf: cpfMask(e.target.value) })}
                         required
                         maxLength={14}
@@ -449,7 +540,7 @@ export default function Equipe() {
                       <Label htmlFor="phone">Telefone *</Label>
                       <Input
                         id="phone"
-                        value={formData.phone}
+                        value={formData.phone || ''}
                         onChange={(e) =>
                           setFormData({ ...formData, phone: phoneMask(e.target.value) })
                         }
@@ -464,7 +555,7 @@ export default function Equipe() {
                       <Input
                         id="email"
                         type="email"
-                        value={formData.email}
+                        value={formData.email || ''}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         required
                       />
@@ -477,7 +568,7 @@ export default function Equipe() {
                       <Input
                         id="password"
                         type="password"
-                        value={formData.password}
+                        value={formData.password || ''}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         required={!formData.id}
                       />
@@ -533,7 +624,7 @@ export default function Equipe() {
                       <Input
                         id="birth_date"
                         type="date"
-                        value={formData.birth_date}
+                        value={formData.birth_date || ''}
                         onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
                       />
                     </div>
@@ -542,7 +633,7 @@ export default function Equipe() {
                       <Input
                         id="admission_date"
                         type="date"
-                        value={formData.admission_date}
+                        value={formData.admission_date || ''}
                         onChange={(e) =>
                           setFormData({ ...formData, admission_date: e.target.value })
                         }
@@ -586,7 +677,7 @@ export default function Equipe() {
                       <Label htmlFor="address">Endereço Completo</Label>
                       <Textarea
                         id="address"
-                        value={formData.address}
+                        value={formData.address || ''}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                         placeholder="Rua, Número, Complemento, Bairro, Cidade - Estado"
                         className="resize-none"
@@ -597,7 +688,7 @@ export default function Equipe() {
                       <Label htmlFor="internal_observations">Observações Internas</Label>
                       <Textarea
                         id="internal_observations"
-                        value={formData.internal_observations}
+                        value={formData.internal_observations || ''}
                         onChange={(e) =>
                           setFormData({ ...formData, internal_observations: e.target.value })
                         }
