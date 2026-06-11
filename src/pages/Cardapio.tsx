@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Plus, Edit, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plus, Edit } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,50 +22,9 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-
-type MenuItem = {
-  id: string
-  name: string
-  category: string
-  price: number
-  description?: string
-  status: 'Ativo' | 'Inativo'
-}
-
-const INITIAL_ITEMS: MenuItem[] = [
-  // Pizzas
-  { id: '1', name: 'Pizza Calabresa', category: 'Pizzas', price: 45, status: 'Ativo' },
-  { id: '2', name: 'Pizza Marguerita', category: 'Pizzas', price: 42, status: 'Ativo' },
-  { id: '3', name: 'Pizza Frango com Catupiry', category: 'Pizzas', price: 48, status: 'Ativo' },
-  { id: '4', name: 'Pizza Portuguesa', category: 'Pizzas', price: 46, status: 'Ativo' },
-  { id: '5', name: 'Pizza Quatro Queijos', category: 'Pizzas', price: 48, status: 'Ativo' },
-  // Massas
-  { id: '6', name: 'Espaguete à Bolonhesa', category: 'Massas', price: 35, status: 'Ativo' },
-  { id: '7', name: 'Fettuccine Alfredo', category: 'Massas', price: 38, status: 'Ativo' },
-  { id: '8', name: 'Lasanha', category: 'Massas', price: 40, status: 'Ativo' },
-  { id: '9', name: 'Penne ao Sugo', category: 'Massas', price: 32, status: 'Ativo' },
-  // Almoço
-  { id: '10', name: 'Contra filé com fritas', category: 'Almoço', price: 30, status: 'Ativo' },
-  { id: '11', name: 'Frango grelhado ou empanado', category: 'Almoço', price: 25, status: 'Ativo' },
-  { id: '12', name: 'Carré', category: 'Almoço', price: 25, status: 'Ativo' },
-  { id: '13', name: 'Filé de frango à parmegiana', category: 'Almoço', price: 30, status: 'Ativo' },
-  { id: '14', name: 'Bife à parmegiana', category: 'Almoço', price: 30, status: 'Ativo' },
-  { id: '15', name: 'Linguiça mineira', category: 'Almoço', price: 25, status: 'Ativo' },
-  { id: '16', name: 'Filé de peixe', category: 'Almoço', price: 30, status: 'Ativo' },
-  { id: '17', name: 'Churrasco misto', category: 'Almoço', price: 30, status: 'Ativo' },
-  { id: '18', name: 'Prato do dia', category: 'Almoço', price: 25, status: 'Ativo' },
-  // Petiscos
-  { id: '19', name: 'Calabresa Acebolada', category: 'Petiscos', price: 28, status: 'Ativo' },
-  { id: '20', name: 'Batata Frita', category: 'Petiscos', price: 22, status: 'Ativo' },
-  { id: '21', name: 'Frango a Passarinho', category: 'Petiscos', price: 32, status: 'Ativo' },
-  { id: '22', name: 'Mandioca Frita', category: 'Petiscos', price: 20, status: 'Ativo' },
-  // Bebidas
-  { id: '23', name: 'Coca-Cola', category: 'Bebidas', price: 8, status: 'Ativo' },
-  { id: '24', name: 'Guaraná', category: 'Bebidas', price: 7, status: 'Ativo' },
-  { id: '25', name: 'Chopp Pilsen', category: 'Bebidas', price: 12, status: 'Ativo' },
-  { id: '26', name: 'Suco de Laranja', category: 'Bebidas', price: 10, status: 'Ativo' },
-  { id: '27', name: 'Água', category: 'Bebidas', price: 4, status: 'Ativo' },
-]
+import { MenuItem } from '@/types'
+import pb from '@/lib/pocketbase/client'
+import { useRealtime } from '@/hooks/use-realtime'
 
 const FILTERS = ['Todas', 'Pizzas', 'Massas', 'Almoço', 'Petiscos', 'Bebidas']
 
@@ -87,7 +46,7 @@ const getCategoryColor = (cat: string) => {
 }
 
 export default function Cardapio() {
-  const [items, setItems] = useState<MenuItem[]>(INITIAL_ITEMS)
+  const [items, setItems] = useState<MenuItem[]>([])
   const [filter, setFilter] = useState<string>('Todas')
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -98,13 +57,29 @@ export default function Cardapio() {
     category: 'Pizzas',
     price: '',
     description: '',
-    status: 'Ativo',
+    status: 'active',
+  })
+
+  const loadItems = async () => {
+    try {
+      const res = await pb.collection('menu_items').getFullList<MenuItem>({ sort: 'category,name' })
+      setItems(res)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  useEffect(() => {
+    loadItems()
+  }, [])
+  useRealtime('menu_items', () => {
+    loadItems()
   })
 
   const filteredItems = items.filter((i) => filter === 'Todas' || i.category === filter)
 
   const openNewItemModal = () => {
-    setFormData({ name: '', category: 'Pizzas', price: '', description: '', status: 'Ativo' })
+    setFormData({ name: '', category: 'Pizzas', price: '', description: '', status: 'active' })
     setEditingItem(null)
     setIsModalOpen(true)
   }
@@ -121,7 +96,7 @@ export default function Cardapio() {
     setIsModalOpen(true)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name || !formData.price || !formData.category) return
 
     const parsedPrice =
@@ -130,21 +105,24 @@ export default function Cardapio() {
         : Number(formData.price)
     if (isNaN(parsedPrice)) return
 
-    const newItem: MenuItem = {
-      id: editingItem ? editingItem.id : String(Date.now()),
+    const data = {
       name: formData.name,
       category: formData.category,
       price: parsedPrice,
       description: formData.description,
-      status: formData.status as 'Ativo' | 'Inativo',
+      status: formData.status,
     }
 
-    if (editingItem) {
-      setItems(items.map((i) => (i.id === editingItem.id ? newItem : i)))
-    } else {
-      setItems([newItem, ...items])
+    try {
+      if (editingItem) {
+        await pb.collection('menu_items').update(editingItem.id, data)
+      } else {
+        await pb.collection('menu_items').create(data)
+      }
+      setIsModalOpen(false)
+    } catch (err) {
+      console.error(err)
     }
-    setIsModalOpen(false)
   }
 
   return (
@@ -161,14 +139,6 @@ export default function Cardapio() {
           <Plus className="w-4 h-4 mr-2" />
           Novo Item
         </Button>
-      </div>
-
-      <div className="flex items-start gap-3 rounded-lg border border-orange-200 bg-orange-50 p-4 text-orange-800 dark:border-orange-900/50 dark:bg-orange-950/20 dark:text-orange-300">
-        <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-        <p className="text-sm">
-          <strong>Aviso de Persistência:</strong> As alterações feitas nesta sessão são locais. Os
-          dados serão restaurados ao recarregar a página até que um banco de dados seja integrado.
-        </p>
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -200,7 +170,7 @@ export default function Cardapio() {
             key={item.id}
             className={cn(
               'p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:shadow-md border-border/60',
-              item.status === 'Inativo' && 'opacity-60 bg-muted/50',
+              item.status === 'inactive' && 'opacity-60 bg-muted/50',
             )}
           >
             <div className="flex-1 flex flex-col gap-1.5">
@@ -228,12 +198,12 @@ export default function Cardapio() {
                 <Badge
                   className={cn(
                     'text-[10px] uppercase tracking-wider',
-                    item.status === 'Ativo'
+                    item.status === 'active'
                       ? 'bg-green-500 hover:bg-green-600 text-white border-transparent'
                       : 'bg-gray-400 hover:bg-gray-500 text-white border-transparent',
                   )}
                 >
-                  {item.status}
+                  {item.status === 'active' ? 'Ativo' : 'Inativo'}
                 </Badge>
               </div>
               <Button
@@ -321,15 +291,15 @@ export default function Cardapio() {
                 <span
                   className={cn(
                     'text-sm font-bold uppercase',
-                    formData.status === 'Ativo' ? 'text-green-600' : 'text-gray-500',
+                    formData.status === 'active' ? 'text-green-600' : 'text-gray-500',
                   )}
                 >
-                  {formData.status}
+                  {formData.status === 'active' ? 'Ativo' : 'Inativo'}
                 </span>
                 <Switch
-                  checked={formData.status === 'Ativo'}
+                  checked={formData.status === 'active'}
                   onCheckedChange={(c) =>
-                    setFormData({ ...formData, status: c ? 'Ativo' : 'Inativo' })
+                    setFormData({ ...formData, status: c ? 'active' : 'inactive' })
                   }
                 />
               </div>

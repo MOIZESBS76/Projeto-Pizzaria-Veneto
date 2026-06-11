@@ -5,10 +5,10 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 
 const columns: { id: OrderStatus; label: string; color: string }[] = [
-  { id: 'Recebido', label: 'Recebido', color: 'bg-blue-500' },
-  { id: 'Em Preparo', label: 'Em Preparo', color: 'bg-orange-500' },
-  { id: 'Pronto', label: 'Pronto', color: 'bg-green-500' },
-  { id: 'Entregue', label: 'Entregue', color: 'bg-gray-500' },
+  { id: 'recebido', label: 'Recebido', color: 'bg-blue-500' },
+  { id: 'em preparo', label: 'Em Preparo', color: 'bg-orange-500' },
+  { id: 'pronto', label: 'Pronto', color: 'bg-green-500' },
+  { id: 'entregue', label: 'Entregue', color: 'bg-gray-500' },
 ]
 
 export function KanbanBoard() {

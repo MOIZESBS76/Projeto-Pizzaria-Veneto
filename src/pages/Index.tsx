@@ -6,7 +6,7 @@ import { useStore } from '@/store/main'
 
 export default function Index() {
   const { tables } = useStore()
-  const occupiedCount = tables.filter((t) => t.status !== 'Livre').length
+  const occupiedCount = tables.filter((t) => t.status !== 'livre').length
 
   return (
     <div className="flex flex-col h-full gap-4 max-w-[1600px] mx-auto">

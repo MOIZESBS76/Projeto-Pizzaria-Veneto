@@ -11,7 +11,6 @@ export function TableGrid() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [now, setNow] = useState(Date.now())
 
-  // Force re-render every minute to update occupied times
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 60000)
     return () => clearInterval(timer)
@@ -24,18 +23,19 @@ export function TableGrid() {
 
   const getTableStyle = (status: TableType['status']) => {
     switch (status) {
-      case 'Livre':
+      case 'livre':
         return 'bg-green-50 hover:bg-green-100 border-green-200 dark:bg-green-950/20 dark:border-green-900 text-green-800 dark:text-green-400'
-      case 'Ocupada':
+      case 'ocupada':
         return 'bg-red-50 hover:bg-red-100 border-red-200 dark:bg-red-950/30 dark:border-red-900 text-red-800 dark:text-red-400'
-      case 'Conta Solicitada':
+      case 'conta solicitada':
         return 'bg-yellow-400 hover:bg-yellow-500 border-yellow-500 text-yellow-950 animate-pulse shadow-yellow-400/50 shadow-lg'
     }
   }
 
-  const getOccupiedTime = (occupiedAt?: Date) => {
-    if (!occupiedAt) return null
-    const diffMins = Math.floor((now - occupiedAt.getTime()) / 60000)
+  const getOccupiedTime = (occupancyTime?: string) => {
+    if (!occupancyTime) return null
+    const occTime = new Date(occupancyTime).getTime()
+    const diffMins = Math.floor((now - occTime) / 60000)
     if (diffMins < 60) return `${diffMins}m`
     const hours = Math.floor(diffMins / 60)
     const mins = diffMins % 60
@@ -52,22 +52,22 @@ export function TableGrid() {
             onClick={() => handleTableClick(table)}
           >
             <div className="p-4 flex flex-col items-center justify-center h-32 text-center">
-              <span className="text-3xl font-bold mb-2 font-mono">{table.number}</span>
+              <span className="text-3xl font-bold mb-2 font-mono">{table.table_number}</span>
               <span className="text-xs font-semibold uppercase tracking-wider opacity-80">
                 {table.status}
               </span>
 
-              {table.status !== 'Livre' && (
+              {table.status !== 'livre' && table.occupancy_time && (
                 <div className="absolute top-2 right-2 flex items-center text-xs font-medium opacity-80 bg-background/50 backdrop-blur-sm px-1.5 py-0.5 rounded">
                   <ClockIcon className="w-3 h-3 mr-1" />
-                  {getOccupiedTime(table.occupiedAt)}
+                  {getOccupiedTime(table.occupancy_time)}
                 </div>
               )}
 
-              {table.status !== 'Livre' && table.customerName && (
+              {table.status !== 'livre' && table.responsible_name && (
                 <div className="mt-2 text-sm font-medium w-full truncate px-2 opacity-90 flex justify-center items-center gap-1">
                   <Users className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{table.customerName}</span>
+                  <span className="truncate">{table.responsible_name}</span>
                 </div>
               )}
             </div>

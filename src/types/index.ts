@@ -1,6 +1,6 @@
-export type OrderStatus = 'Recebido' | 'Em Preparo' | 'Pronto' | 'Entregue'
-export type OrderType = 'Salão' | 'Delivery' | 'Retirada'
-export type TableStatus = 'Livre' | 'Ocupada' | 'Conta Solicitada'
+export type OrderStatus = 'recebido' | 'em preparo' | 'pronto' | 'entregue'
+export type OrderType = 'salão' | 'delivery' | 'retirada'
+export type TableStatus = 'livre' | 'ocupada' | 'conta solicitada'
 
 export interface OrderItem {
   name: string
@@ -10,20 +10,37 @@ export interface OrderItem {
 
 export interface Order {
   id: string
+  order_number: string
   type: OrderType
-  customerName: string
+  customer_name?: string
+  phone?: string
   items: OrderItem[]
-  value: number
   status: OrderStatus
-  createdAt: Date
-  tableId?: string
+  total_value: number
+  table?: string
+  address?: string
+  created: string
+  updated: string
 }
 
 export interface Table {
   id: string
-  number: number
+  table_number: number
   status: TableStatus
-  occupiedAt?: Date
-  customerName?: string
-  currentOrderId?: string
+  responsible_name?: string
+  occupancy_time?: string
+  bill_total?: number
+  created: string
+  updated: string
+}
+
+export interface MenuItem {
+  id: string
+  name: string
+  category: string
+  price: number
+  description?: string
+  status: 'active' | 'inactive'
+  created: string
+  updated: string
 }
