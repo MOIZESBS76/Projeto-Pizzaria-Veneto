@@ -13,100 +13,207 @@ const mockOrders: Order[] = [
     id: '1024',
     type: 'Delivery',
     customerName: 'João Silva',
-    items: ['1 Pizza Calabresa'],
-    value: 55,
+    items: [
+      { name: 'Calabresa', price: 45, quantity: 1 },
+      { name: 'Coca-Cola', price: 8, quantity: 1 },
+    ],
+    value: 53,
     status: 'Recebido',
     createdAt: new Date(),
   },
   {
     id: '1025',
     type: 'Salão',
-    customerName: 'Mesa 4',
-    items: ['1 Pizza Marguerita', '1 Suco'],
-    value: 62,
+    customerName: 'Mesa 2 - Maria',
+    items: [
+      { name: 'Marguerita', price: 42, quantity: 1 },
+      { name: 'Chopp Pilsen', price: 12, quantity: 1 },
+    ],
+    value: 54,
     status: 'Em Preparo',
     createdAt: new Date(Date.now() - 15 * 60000),
-    tableId: 't4',
+    tableId: 't2',
   },
   {
     id: '1026',
     type: 'Retirada',
-    customerName: 'Maria Oliveira',
-    items: ['2 Pizzas Frango c/ Catupiry'],
-    value: 110,
+    customerName: 'Carlos Santos',
+    items: [
+      { name: 'Frango com Catupiry', price: 48, quantity: 1 },
+      { name: 'Guaraná', price: 7, quantity: 1 },
+    ],
+    value: 55,
     status: 'Pronto',
     createdAt: new Date(Date.now() - 30 * 60000),
   },
   {
     id: '1027',
-    type: 'Salão',
-    customerName: 'Mesa 2',
-    items: ['1 Lasanha Bolonhesa', '1 Vinho'],
-    value: 85,
+    type: 'Delivery',
+    customerName: 'Ana Souza',
+    items: [
+      { name: 'Espaguete à Bolonhesa', price: 35, quantity: 1 },
+      { name: 'Suco Laranja', price: 10, quantity: 1 },
+    ],
+    value: 45,
     status: 'Recebido',
     createdAt: new Date(Date.now() - 5 * 60000),
-    tableId: 't2',
   },
   {
     id: '1028',
+    type: 'Salão',
+    customerName: 'Mesa 4 - Roberto',
+    items: [
+      { name: 'Lasanha', price: 40, quantity: 1 },
+      { name: 'Água', price: 4, quantity: 1 },
+    ],
+    value: 44,
+    status: 'Entregue',
+    createdAt: new Date(Date.now() - 40 * 60000),
+    tableId: 't4',
+  },
+  {
+    id: '1029',
     type: 'Delivery',
-    customerName: 'Carlos Souza',
-    items: ['1 Pizza Portuguesa', '1 Coca-Cola 2L'],
-    value: 72,
+    customerName: 'Marcos Almeida',
+    items: [
+      { name: 'Portuguesa', price: 46, quantity: 1 },
+      { name: 'Batata Frita', price: 22, quantity: 1 },
+    ],
+    value: 68,
     status: 'Em Preparo',
     createdAt: new Date(Date.now() - 20 * 60000),
   },
   {
-    id: '1029',
+    id: '1030',
+    type: 'Salão',
+    customerName: 'Mesa 7 - Lucia',
+    items: [
+      { name: 'Contra filé', price: 30, quantity: 1 },
+      { name: 'Coca-Cola', price: 8, quantity: 1 },
+    ],
+    value: 38,
+    status: 'Em Preparo',
+    createdAt: new Date(Date.now() - 10 * 60000),
+    tableId: 't7',
+  },
+  {
+    id: '1031',
     type: 'Retirada',
-    customerName: 'Ana Costa',
-    items: ['1 Porção de Batata Frita'],
-    value: 35,
+    customerName: 'Fernanda Lima',
+    items: [{ name: 'Quatro Queijos', price: 48, quantity: 1 }],
+    value: 48,
     status: 'Recebido',
     createdAt: new Date(),
   },
   {
-    id: '1030',
-    type: 'Salão',
-    customerName: 'Mesa 10',
-    items: ['1 Pizza Doce Prestígio'],
-    value: 50,
+    id: '1032',
+    type: 'Delivery',
+    customerName: 'Paulo Roberto',
+    items: [
+      { name: 'Frango a Passarinho', price: 32, quantity: 1 },
+      { name: 'Chopp Pilsen', price: 12, quantity: 2 },
+    ],
+    value: 56,
     status: 'Pronto',
-    createdAt: new Date(Date.now() - 40 * 60000),
+    createdAt: new Date(Date.now() - 25 * 60000),
+  },
+  {
+    id: '1033',
+    type: 'Salão',
+    customerName: 'Mesa 10 - José',
+    items: [
+      { name: 'Parmegianas', price: 30, quantity: 1 },
+      { name: 'Guaraná', price: 7, quantity: 1 },
+    ],
+    value: 37,
+    status: 'Entregue',
+    createdAt: new Date(Date.now() - 60 * 60000),
     tableId: 't10',
   },
   {
-    id: '1031',
+    id: '1034',
+    type: 'Salão',
+    customerName: 'Mesa 12 - Julia',
+    items: [
+      { name: 'Penne ao Sugo', price: 32, quantity: 1 },
+      { name: 'Suco Laranja', price: 10, quantity: 1 },
+    ],
+    value: 42,
+    status: 'Pronto',
+    createdAt: new Date(Date.now() - 35 * 60000),
+    tableId: 't12',
+  },
+  {
+    id: '1035',
     type: 'Delivery',
-    customerName: 'Roberto Lima',
-    items: ['1 Espaguete Carbonara'],
-    value: 48,
+    customerName: 'Ricardo Alves',
+    items: [
+      { name: 'Calabresa', price: 45, quantity: 1 },
+      { name: 'Calabresa Acebolada', price: 28, quantity: 1 },
+    ],
+    value: 73,
     status: 'Entregue',
-    createdAt: new Date(Date.now() - 60 * 60000),
+    createdAt: new Date(Date.now() - 80 * 60000),
   },
 ]
 
 const generateTables = (): Table[] => {
   const tables: Table[] = []
+
+  const occupiedMapping: Record<
+    number,
+    { status: TableStatus; occupiedAt: Date; orderId: string; customer: string }
+  > = {
+    2: {
+      status: 'Ocupada',
+      occupiedAt: new Date(Date.now() - 15 * 60000),
+      orderId: '1025',
+      customer: 'Maria',
+    },
+    4: {
+      status: 'Conta Solicitada',
+      occupiedAt: new Date(Date.now() - 45 * 60000),
+      orderId: '1028',
+      customer: 'Roberto',
+    },
+    7: {
+      status: 'Ocupada',
+      occupiedAt: new Date(Date.now() - 10 * 60000),
+      orderId: '1030',
+      customer: 'Lucia',
+    },
+    10: {
+      status: 'Conta Solicitada',
+      occupiedAt: new Date(Date.now() - 65 * 60000),
+      orderId: '1033',
+      customer: 'José',
+    },
+    12: {
+      status: 'Ocupada',
+      occupiedAt: new Date(Date.now() - 35 * 60000),
+      orderId: '1034',
+      customer: 'Julia',
+    },
+  }
+
   for (let i = 1; i <= 12; i++) {
-    let status: TableStatus = 'Livre'
-    let occupiedAt = undefined
-
-    if (i === 4 || i === 2) {
-      status = 'Ocupada'
-      occupiedAt = new Date(Date.now() - (Math.random() * 60 + 10) * 60000)
-    } else if (i === 10 || i === 7) {
-      status = 'Conta Solicitada'
-      occupiedAt = new Date(Date.now() - (Math.random() * 90 + 30) * 60000)
+    const mapping = occupiedMapping[i]
+    if (mapping) {
+      tables.push({
+        id: `t${i}`,
+        number: i,
+        status: mapping.status,
+        occupiedAt: mapping.occupiedAt,
+        currentOrderId: mapping.orderId,
+        customerName: mapping.customer,
+      })
+    } else {
+      tables.push({
+        id: `t${i}`,
+        number: i,
+        status: 'Livre',
+      })
     }
-
-    tables.push({
-      id: `t${i}`,
-      number: i,
-      status,
-      occupiedAt,
-      currentOrderId: [4, 2, 10].includes(i) ? `102${i === 10 ? 0 : i === 4 ? 5 : 7}` : undefined,
-    })
   }
   return tables
 }
@@ -130,6 +237,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             status,
             occupiedAt: status === 'Livre' ? undefined : t.occupiedAt || new Date(),
             currentOrderId: status === 'Livre' ? undefined : t.currentOrderId,
+            customerName: status === 'Livre' ? undefined : t.customerName,
           }
         }
         return t

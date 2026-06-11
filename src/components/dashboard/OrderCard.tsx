@@ -80,10 +80,13 @@ export function OrderCard({ order }: OrderCardProps) {
       </div>
 
       <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded-md">
-        <ul className="list-disc list-inside space-y-0.5">
+        <ul className="space-y-1">
           {order.items.map((item, idx) => (
-            <li key={idx} className="truncate text-xs">
-              {item}
+            <li key={idx} className="text-xs flex justify-between gap-2">
+              <span className="truncate flex-1">
+                {item.quantity}x {item.name}
+              </span>
+              <span className="shrink-0 font-medium">{formatCurrency(item.price)}</span>
             </li>
           ))}
         </ul>

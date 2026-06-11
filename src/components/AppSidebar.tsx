@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import logoImg from '@/assets/image-45948.png'
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
@@ -22,12 +23,13 @@ export function AppSidebar() {
 
   return (
     <Sidebar variant="inset">
-      <SidebarHeader className="flex h-16 items-center justify-center border-b border-border/50">
-        <div className="flex items-center gap-3 font-bold text-2xl text-primary tracking-tight px-4 w-full">
-          <div className="bg-primary text-primary-foreground p-1.5 rounded-lg shadow-sm">
-            <Pizza className="w-6 h-6" />
-          </div>
-          <span className="truncate">VENETO</span>
+      <SidebarHeader className="flex h-24 items-center justify-center border-b border-border/50 bg-background">
+        <div className="flex items-center justify-center w-full px-4 h-full py-3">
+          <img
+            src={logoImg}
+            alt="VENETO"
+            className="h-full w-auto max-w-full object-contain drop-shadow-md"
+          />
         </div>
       </SidebarHeader>
       <SidebarContent className="px-2 py-4">

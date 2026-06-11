@@ -58,15 +58,16 @@ export function TableGrid() {
               </span>
 
               {table.status !== 'Livre' && (
-                <div className="absolute bottom-2 right-2 flex items-center text-xs font-medium opacity-80 bg-background/50 backdrop-blur-sm px-1.5 py-0.5 rounded">
+                <div className="absolute top-2 right-2 flex items-center text-xs font-medium opacity-80 bg-background/50 backdrop-blur-sm px-1.5 py-0.5 rounded">
                   <ClockIcon className="w-3 h-3 mr-1" />
                   {getOccupiedTime(table.occupiedAt)}
                 </div>
               )}
 
-              {table.status !== 'Livre' && (
-                <div className="absolute top-2 left-2 opacity-50">
-                  <Users className="w-4 h-4" />
+              {table.status !== 'Livre' && table.customerName && (
+                <div className="mt-2 text-sm font-medium w-full truncate px-2 opacity-90 flex justify-center items-center gap-1">
+                  <Users className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{table.customerName}</span>
                 </div>
               )}
             </div>

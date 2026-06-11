@@ -97,7 +97,12 @@ export function TableDrawer({ table, open, onOpenChange }: TableDrawerProps) {
                           key={idx}
                           className="text-sm flex justify-between items-center border-b border-border/50 pb-2 last:border-0 last:pb-0"
                         >
-                          <span>{item}</span>
+                          <span>
+                            {item.quantity}x {item.name}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {formatCurrency(item.price * item.quantity)}
+                          </span>
                         </li>
                       ))}
                     </ul>

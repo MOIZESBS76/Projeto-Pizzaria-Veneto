@@ -3,6 +3,7 @@ import { Clock, ShoppingBag, Receipt } from 'lucide-react'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Badge } from '@/components/ui/badge'
 import { useStore } from '@/store/main'
+import logoImg from '@/assets/image-45948.png'
 
 export function AppHeader() {
   const [time, setTime] = useState(new Date())
@@ -20,9 +21,8 @@ export function AppHeader() {
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b bg-background px-4 shadow-sm md:px-6">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-1" />
-        <div className="md:hidden flex items-center gap-2 font-bold text-primary text-xl">
-          <span className="bg-primary text-primary-foreground p-1 rounded-md">V</span>
-          VENETO
+        <div className="md:hidden flex items-center h-10">
+          <img src={logoImg} alt="VENETO" className="h-full w-auto object-contain drop-shadow-md" />
         </div>
       </div>
 
