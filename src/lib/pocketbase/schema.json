@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T14:25:38.956Z",
+  "generatedAt": "2026-06-11T14:40:57.601Z",
   "collections": [
     {
       "name": "users",
@@ -231,6 +231,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "current_items",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_tables_number ON tables (table_number)"]

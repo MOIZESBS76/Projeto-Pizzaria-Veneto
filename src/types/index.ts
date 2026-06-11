@@ -6,6 +6,7 @@ export interface OrderItem {
   name: string
   price: number
   quantity: number
+  observation?: string
 }
 
 export interface Order {
@@ -23,6 +24,15 @@ export interface Order {
   updated: string
 }
 
+export interface TableItem {
+  id: string
+  menu_item_id: string
+  name: string
+  price: number
+  quantity: number
+  observation?: string
+}
+
 export interface Table {
   id: string
   table_number: number
@@ -30,6 +40,7 @@ export interface Table {
   responsible_name?: string
   occupancy_time?: string
   bill_total?: number
+  current_items?: TableItem[]
   created: string
   updated: string
 }
