@@ -34,6 +34,34 @@ export interface Table {
   updated: string
 }
 
+export type UserRole =
+  | 'Administrador'
+  | 'Gerente'
+  | 'Garçom'
+  | 'Caixa'
+  | 'Cozinheiro'
+  | 'Entregador'
+export type UserStatus = 'Ativo' | 'Inativo' | 'Férias' | 'Afastado'
+
+export interface User {
+  id: string
+  name: string
+  email: string
+  avatar: string
+  cpf?: string
+  phone?: string
+  nickname?: string
+  role?: UserRole
+  status?: UserStatus
+  birth_date?: string
+  admission_date?: string
+  address?: string
+  internal_observations?: string
+  permissions?: Record<string, boolean>
+  created: string
+  updated: string
+}
+
 export interface MenuItem {
   id: string
   name: string

@@ -9,6 +9,7 @@ import Layout from './components/Layout'
 import Index from './pages/Index'
 import Cardapio from './pages/Cardapio'
 import Relatorios from './pages/Relatorios'
+import Equipe from './pages/Equipe'
 import Configuracoes from './pages/Configuracoes'
 import NotFound from './pages/NotFound'
 import Login from './pages/Login'
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/cardapio" element={<Cardapio />} />
             <Route path="/relatorios" element={<Relatorios />} />
+            <Route path="/equipe" element={<Equipe />} />
             <Route path="/configuracoes" element={<Configuracoes />} />
           </Route>
           <Route path="*" element={<NotFound />} />

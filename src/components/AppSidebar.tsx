@@ -1,4 +1,4 @@
-import { LayoutDashboard, UtensilsCrossed, FileBarChart, Settings, Pizza } from 'lucide-react'
+import { LayoutDashboard, UtensilsCrossed, FileBarChart, Settings, Users } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Sidebar,
@@ -15,6 +15,7 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: UtensilsCrossed, label: 'Cardápio', path: '/cardapio' },
   { icon: FileBarChart, label: 'Relatórios', path: '/relatorios' },
+  { icon: Users, label: 'Equipe', path: '/equipe' },
   { icon: Settings, label: 'Configurações', path: '/configuracoes' },
 ]
 

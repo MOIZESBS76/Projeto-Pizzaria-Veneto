@@ -1,13 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Clock, ShoppingBag, Receipt } from 'lucide-react'
+import { Clock, ShoppingBag, Receipt, User, LogOut } from 'lucide-react'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Badge } from '@/components/ui/badge'
 import { useStore } from '@/store/main'
+import { useAuth } from '@/hooks/use-auth'
 import logoImg from '@/assets/image-45948.png'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export function AppHeader() {
   const [time, setTime] = useState(new Date())
   const { orders } = useStore()
+  const { user, signOut } = useAuth()
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000)
@@ -58,6 +69,49 @@ export function AppHeader() {
               {openOrders}
             </Badge>
           </div>
+        </div>
+
+        <div className="pl-2 border-l border-border hidden sm:flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 outline-none hover:bg-accent rounded-full py-1 pr-3 pl-1 transition-colors">
+                <Avatar className="h-8 w-8 border border-border">
+                  <AvatarImage
+                    src={
+                      user?.avatar
+                        ? `${import.meta.env.VITE_POCKETBASE_URL}/api/files/_pb_users_auth_/${user.id}/${user.avatar}`
+                        : undefined
+                    }
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-muted">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium leading-none">
+                    {user?.nickname || user?.name || 'Usuário'}
+                  </span>
+                  {user?.role && (
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider leading-none mt-1">
+                      {user.role}
+                    </span>
+                  )}
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={signOut}
+                className="text-red-600 focus:bg-red-50 focus:text-red-700 cursor-pointer"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair da conta</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
